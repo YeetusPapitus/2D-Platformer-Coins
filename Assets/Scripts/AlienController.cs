@@ -8,6 +8,7 @@ public class AlienController : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float jumpForce = 5f;
     [SerializeField] private LayerMask groundLayer; 
+    [SerializeField] private LayerMask sprinkleLayer; 
     [SerializeField] private BoxCollider2D boxCollider;
 
     private Rigidbody2D rb;
@@ -28,11 +29,21 @@ public class AlienController : MonoBehaviour
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
+
+        if (ShouldDie())
+        {
+            transform.position = spawnPoint.position;
+        }
     }
 
     private bool IsGrounded()
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, boxCollider.bounds.extents.y + 0.1f, groundLayer);
+        return hit.collider != null;
+    }
+    private bool ShouldDie()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, boxCollider.bounds.extents.y + 0.1f, sprinkleLayer);
         return hit.collider != null;
     }
 
@@ -41,6 +52,10 @@ public class AlienController : MonoBehaviour
         if (other.CompareTag("Coin")) 
         {
             Destroy(other.gameObject);
+        }
+        if (other.CompareTag("Checkpoint")) 
+        {
+            spawnPoint = other.GetComponent<Checkpoint>().GetSpawnPoint();
         }
     }
 
