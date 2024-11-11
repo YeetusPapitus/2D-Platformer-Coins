@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AlienController : MonoBehaviour
 {
-    [SerializeField] private Transform spawnPoint;
+    private Transform spawnPoint;
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float jumpForce = 5f;
     [SerializeField] private LayerMask groundLayer; 
@@ -20,30 +20,27 @@ public class AlienController : MonoBehaviour
 
     private void Update()
     {
+
+        if (IsCollidingWith(sprinkleLayer))
+        {
+            transform.position = spawnPoint.position;
+        }
         // Movement
         float moveInput = Input.GetAxis("Horizontal");
         rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
 
         // Jump
-        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
+        if (Input.GetKeyDown(KeyCode.Space) && IsCollidingWith(groundLayer))
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
 
-        if (ShouldDie())
-        {
-            transform.position = spawnPoint.position;
-        }
+
     }
 
-    private bool IsGrounded()
+    private bool IsCollidingWith(LayerMask mask)
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, boxCollider.bounds.extents.y + 0.1f, groundLayer);
-        return hit.collider != null;
-    }
-    private bool ShouldDie()
-    {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, boxCollider.bounds.extents.y + 0.1f, sprinkleLayer);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, boxCollider.bounds.extents.y + 0.1f, mask);
         return hit.collider != null;
     }
 
@@ -54,9 +51,15 @@ public class AlienController : MonoBehaviour
             Destroy(other.gameObject);
         }
         if (other.CompareTag("Checkpoint")) 
-        {
+        {   if (spawnPoint != null)
+                {
+                    spawnPoint.GetComponentInParent<Checkpoint>().SetCheckpointState(false);    
+                }
             spawnPoint = other.GetComponent<Checkpoint>().GetSpawnPoint();
+            other.GetComponent<Checkpoint>().SetCheckpointState(true);
+
         }
+        
     }
 
 

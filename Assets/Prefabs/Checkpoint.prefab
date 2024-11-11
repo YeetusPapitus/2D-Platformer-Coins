@@ -208,3 +208,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPoint: {fileID: 1060452564717600408}
+  indicatorRenderer: {fileID: 1044513283203099768}
+  activeColor: {r: 0.27803493, g: 0.8301887, b: 0.3911665, a: 1}
+  inactiveColor: {r: 0.8773585, g: 0.8398642, b: 0.16140087, a: 1}

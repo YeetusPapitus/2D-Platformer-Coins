@@ -351,7 +351,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b109e748b7a82f94bbcdee43c577b836, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnPoint: {fileID: 1506019596}
   moveSpeed: 7
   jumpForce: 7
   groundLayer:
