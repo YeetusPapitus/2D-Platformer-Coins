@@ -1,21 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class AlienController : MonoBehaviour
 {
-    private Transform spawnPoint;
+    public enum CharacterState { Idle, Walk, Jump }
+
+    private Checkpoint checkpoint;
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float jumpForce = 5f;
     [SerializeField] private LayerMask groundLayer; 
     [SerializeField] private LayerMask sprinkleLayer; 
     [SerializeField] private BoxCollider2D boxCollider;
+    private CharacterState characterState;
+
+    public Action<int> OnCoinCollected;
+
+    private int coinsCollected = 0;
 
     private Rigidbody2D rb;
+
+    private Animator animator;
+
+    private SpriteRenderer spriteRenderer;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
@@ -23,19 +37,43 @@ public class AlienController : MonoBehaviour
 
         if (IsCollidingWith(sprinkleLayer))
         {
-            transform.position = spawnPoint.position;
+            transform.position = checkpoint.GetSpawnPoint().position;
         }
         // Movement
         float moveInput = Input.GetAxis("Horizontal");
         rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
 
-        // Jump
-        if (Input.GetKeyDown(KeyCode.Space) && IsCollidingWith(groundLayer))
+        bool isGrounded = IsCollidingWith(groundLayer);
+
+        if(rb.velocity.x !=0 && isGrounded)
         {
+            characterState = CharacterState.Walk;
+            spriteRenderer.flipX = rb.velocity.x < 0;
+
+            // if(rb.velocity.x < 0)
+            // {
+            //     spriteRenderer.flipX = true;
+            // }
+            // else
+            // {
+            //     spriteRenderer.flipX = false;
+            // }
+        }
+        else
+        {
+            characterState = CharacterState.Idle;
+        }
+
+        // var newState = rb.velocity.x !=0 ? CharacterState.Walk : CharacterState.Idle;
+
+        // Jump
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            characterState = CharacterState.Jump;
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
 
-
+        animator.SetInteger("state", (int)characterState);
     }
 
     private bool IsCollidingWith(LayerMask mask)
@@ -48,15 +86,17 @@ public class AlienController : MonoBehaviour
     {
         if (other.CompareTag("Coin")) 
         {
+            coinsCollected++;
+            OnCoinCollected?.Invoke(coinsCollected);
             Destroy(other.gameObject);
         }
         if (other.CompareTag("Checkpoint")) 
-        {   if (spawnPoint != null)
+        {   if (checkpoint != null)
                 {
-                    spawnPoint.GetComponentInParent<Checkpoint>().SetCheckpointState(false);    
+                    checkpoint.SetCheckpointState(false);    
                 }
-            spawnPoint = other.GetComponent<Checkpoint>().GetSpawnPoint();
-            other.GetComponent<Checkpoint>().SetCheckpointState(true);
+            checkpoint = other.GetComponent<Checkpoint>();
+            checkpoint.SetCheckpointState(true);
 
         }
         
