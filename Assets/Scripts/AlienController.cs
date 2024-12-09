@@ -13,9 +13,12 @@ public class AlienController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer; 
     [SerializeField] private LayerMask sprinkleLayer; 
     [SerializeField] private BoxCollider2D boxCollider;
+
+    private int activeLives = 3;
     private CharacterState characterState;
 
     public Action<int> OnCoinCollected;
+    public Action<int> OnActiveLivesChange;
 
     private int coinsCollected = 0;
 
@@ -37,6 +40,8 @@ public class AlienController : MonoBehaviour
 
         if (IsCollidingWith(sprinkleLayer))
         {
+            activeLives--;
+            OnActiveLivesChange?.Invoke(activeLives);
             transform.position = checkpoint.GetSpawnPoint().position;
         }
         // Movement
@@ -45,9 +50,8 @@ public class AlienController : MonoBehaviour
 
         bool isGrounded = IsCollidingWith(groundLayer);
 
-        if(rb.velocity.x !=0 && isGrounded)
+        if(rb.velocity.x !=0)
         {
-            characterState = CharacterState.Walk;
             spriteRenderer.flipX = rb.velocity.x < 0;
 
             // if(rb.velocity.x < 0)
@@ -59,11 +63,23 @@ public class AlienController : MonoBehaviour
             //     spriteRenderer.flipX = false;
             // }
         }
+
+        if(isGrounded && rb.velocity.x != 0)
+        {
+            characterState = CharacterState.Walk;
+        }
+
+        else if(!isGrounded)
+        {
+            characterState = CharacterState.Jump;
+        }
+
         else
         {
             characterState = CharacterState.Idle;
         }
 
+        animator.SetInteger("state", (int)characterState);
         // var newState = rb.velocity.x !=0 ? CharacterState.Walk : CharacterState.Idle;
 
         // Jump
@@ -73,7 +89,6 @@ public class AlienController : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
 
-        animator.SetInteger("state", (int)characterState);
     }
 
     private bool IsCollidingWith(LayerMask mask)
