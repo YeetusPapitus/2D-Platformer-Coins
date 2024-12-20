@@ -40,9 +40,7 @@ public class AlienController : MonoBehaviour
 
         if (IsCollidingWith(sprinkleLayer))
         {
-            activeLives--;
-            OnActiveLivesChange?.Invoke(activeLives);
-            transform.position = checkpoint.GetSpawnPoint().position;
+            Respawn();
         }
         // Movement
         float moveInput = Input.GetAxis("Horizontal");
@@ -115,6 +113,21 @@ public class AlienController : MonoBehaviour
 
         }
         
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if(other.collider.gameObject.CompareTag("Enemy"))
+        {
+            Respawn();
+        }
+    }
+
+    private void Respawn()
+    {
+        activeLives--;
+        OnActiveLivesChange?.Invoke(activeLives);
+        transform.position = checkpoint.GetSpawnPoint().position;
     }
 
 
