@@ -8,12 +8,14 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SceneManager.LoadSceneAsync("SampleScene", LoadSceneMode.Additive);
+        LoadAndUnloadScene("Level1Scene");
     }
 
-    // Update is called once per frame
-    void Update()
+    public void LoadAndUnloadScene(string loadScene, string unloadScene = null)
     {
-        
+        if(unloadScene != null)
+            SceneManager.UnloadSceneAsync(unloadScene);
+
+        SceneManager.LoadSceneAsync(loadScene, LoadSceneMode.Additive);
     }
 }

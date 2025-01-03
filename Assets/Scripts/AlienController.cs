@@ -103,7 +103,7 @@ public class AlienController : MonoBehaviour
             OnCoinCollected?.Invoke(coinsCollected);
             Destroy(other.gameObject);
         }
-        if (other.CompareTag("Checkpoint")) 
+        else if (other.CompareTag("Checkpoint")) 
         {   if (checkpoint != null)
                 {
                     checkpoint.SetCheckpointState(false);    
@@ -111,6 +111,11 @@ public class AlienController : MonoBehaviour
             checkpoint = other.GetComponent<Checkpoint>();
             checkpoint.SetCheckpointState(true);
 
+        }
+        else if (other.CompareTag("Endpoint"))
+        {
+            var endPoint = other.gameObject.GetComponent<Endpoint>();
+            endPoint.EndLevel();
         }
         
     }
