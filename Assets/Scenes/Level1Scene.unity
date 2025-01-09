@@ -526,6 +526,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   boxCollider: {fileID: 626328687}
+  sfxBgMusic: {fileID: 4488986011997029147, guid: a09f9f6905e6f1849aa65d5fc18bfdb9, type: 3}
 --- !u!50 &626328686
 Rigidbody2D:
   serializedVersion: 4
