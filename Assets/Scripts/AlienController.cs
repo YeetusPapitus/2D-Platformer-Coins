@@ -13,7 +13,6 @@ public class AlienController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer; 
     [SerializeField] private LayerMask sprinkleLayer; 
     [SerializeField] private BoxCollider2D boxCollider;
-    [SerializeField] private GameObject sfxBgMusic;
 
     private int activeLives = 3;
     private CharacterState characterState;
@@ -34,7 +33,7 @@ public class AlienController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        Instantiate(sfxBgMusic, transform.position, Quaternion.identity);
+     
     }
 
     private void Update()
