@@ -2,25 +2,29 @@ using UnityEngine;
 
 public class AudioObject : MonoBehaviour
 {
-    private AudioSource audioSource;
+    private static AudioObject instance;
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (!audioSource.isPlaying)
+        // If an instance of the AudioObject already exists, destroy this one
+        if (instance != null)
         {
             Destroy(gameObject);
+            return;
+        }
+
+        // Otherwise, set this as the instance and make sure it doesn't get destroyed on load
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    // Optionally, ensure the music is playing when the scene starts
+    private void Start()
+    {
+        AudioSource audioSource = GetComponent<AudioSource>();
+        if (!audioSource.isPlaying)
+        {
+            audioSource.Play(); // or use your preferred settings
         }
     }
 }

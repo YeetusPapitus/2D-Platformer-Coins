@@ -92,7 +92,7 @@ public class AlienController : MonoBehaviour
 
     private bool IsCollidingWith(LayerMask mask)
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, boxCollider.bounds.extents.y + 0.1f, mask);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, boxCollider.bounds.extents.y + 0.25f, mask);
         return hit.collider != null;
     }
 
@@ -141,6 +141,6 @@ public class AlienController : MonoBehaviour
     {
         // Visualize the ground detection ray in the editor
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * (boxCollider.bounds.extents.y + 0.1f));
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * (boxCollider.bounds.extents.y + 0.25f));
     }
 }
