@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class Endpoint : MonoBehaviour
 {
@@ -8,7 +8,6 @@ public class Endpoint : MonoBehaviour
     [SerializeField] private string curScene;
     private GameManager gameManager;
 
-    // Start is called before the first frame update
     void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
@@ -23,11 +22,23 @@ public class Endpoint : MonoBehaviour
     {
         if (gameManager != null)
         {
-            gameManager.LoadAndUnloadScene(nextScene, curScene);
+            StartCoroutine(EndLevelRoutine());
         }
         else
         {
             Debug.LogError("GameManager is null, unable to load scenes.");
         }
+    }
+
+    private IEnumerator EndLevelRoutine()
+    {
+        gameManager.LoadSceneAdditively(nextScene);
+
+        while (!SceneManager.GetSceneByName(nextScene).isLoaded)
+        {
+            yield return null;
+        }
+
+        gameManager.UnloadScene(curScene);
     }
 }

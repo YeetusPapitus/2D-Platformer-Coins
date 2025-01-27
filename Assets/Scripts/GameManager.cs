@@ -6,10 +6,8 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager instance;
 
-    // Start is called before the first frame update
     void Awake()
     {
-        // Singleton pattern to ensure only one GameManager exists
         if (instance != null)
         {
             Destroy(gameObject);
@@ -17,47 +15,50 @@ public class GameManager : MonoBehaviour
         }
 
         instance = this;
-        DontDestroyOnLoad(gameObject); // Ensures GameManager persists across scenes
+        DontDestroyOnLoad(gameObject);
     }
 
     void Start()
     {
-        // Load the AudioManagerScene and StartMenuScene additively at the start
-        LoadAndUnloadScene("AudioManagerScene");
-        LoadAndUnloadScene("StartMenuScene");
+        LoadSceneAdditively("AudioManagerScene");
+        LoadSceneAdditively("StartMenuScene");
     }
 
-    public void LoadAndUnloadScene(string loadScene, string unloadScene = null)
+    public void LoadSceneAdditively(string sceneName)
     {
-        // Unload the old scene if one is provided
-        if (unloadScene != null)
-        {
-            SceneManager.UnloadSceneAsync(unloadScene);
-        }
+        Debug.Log($"Loading scene: {sceneName}");
+        SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+    }
 
-        // Load the new scene additively so the AudioManagerScene stays loaded
-        SceneManager.LoadSceneAsync(loadScene, LoadSceneMode.Additive);
+    public void UnloadScene(string sceneName)
+    {
+        StartCoroutine(UnloadSceneAsync(sceneName));
+    }
+
+    private IEnumerator UnloadSceneAsync(string sceneName)
+    {
+        AsyncOperation unloadOperation = SceneManager.UnloadSceneAsync(sceneName);
+
+        while (!unloadOperation.isDone)
+        {
+            yield return null;
+        }
     }
 
     public void StartNewGame()
     {
-        // Load the first level additively and then unload the StartMenuScene
         StartCoroutine(LoadFirstLevelAndUnloadStartMenu());
     }
 
-    // Coroutine to make sure the StartMenuScene is unloaded after Level1Scene is fully loaded
     private IEnumerator LoadFirstLevelAndUnloadStartMenu()
     {
-        // Load the first level additively
-        LoadAndUnloadScene("Level1Scene");
+        LoadSceneAdditively("Level1Scene");
 
-        // Wait for the Level1Scene to finish loading
         while (!SceneManager.GetSceneByName("Level1Scene").isLoaded)
         {
             yield return null;
         }
 
-        // Now unload the StartMenuScene
-        LoadAndUnloadScene("Level1Scene", "StartMenuScene");
+        UnloadScene("StartMenuScene");
     }
 }
